@@ -28,16 +28,25 @@ provider:
 
 # you can add packaging information here
 package:
- include:
-   - node_modules
-   - lambda
+  include:
+    - node_modules
+    - lambda
+    - config
 
 functions:
   scraper:
     name: ${self:provider.stage}-scraper
-    handler: lambda/scraper/handler.hello
+    handler: lambda/scraper/handler.handler
     events:
       - http: ANY /
+
+  graphql:
+    handler: lambda/graphql/handler.graphqlHandler
+    events:
+    - http:
+        path: graphql
+        method: post
+        cors: true
 
 resources:
   - ${file(infrastructure/dynamo.yaml)}

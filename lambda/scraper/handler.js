@@ -10,7 +10,8 @@ const tableName = process.env.DNS_SERVERS_TABLE
 var AWS = require('aws-sdk');
 AWS.config.update({ region: 'eu-west-1' });
 
-var ddb = new AWS.DynamoDB.DocumentClient({
+var ddb
+ddb = new AWS.DynamoDB.DocumentClient({
   region: 'localhost',
   endpoint: 'http://localhost:8000'
 })
@@ -19,7 +20,7 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-module.exports.hello = async (event) => {
+module.exports.handler = async (event) => {
   const html = await rp(url);
   const countriesNodes = $('div.col-12.col-lg-8 > ul > li > a', html)
   const countries = [];
@@ -29,6 +30,8 @@ module.exports.hello = async (event) => {
       name: countriesNodes[i].children[0].data.toLocaleLowerCase()
     });
   }
+
+  console.log(countries.length)
 
   const promises = countries.map(async country => {
     await sleep(Math.random() * 1000 + 500)
