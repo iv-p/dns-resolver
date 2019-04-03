@@ -1,13 +1,16 @@
 {
   "dependencies": {
+    "aws-sdk": "^2.434.0",
     "cheerio": "^1.0.0-rc.2",
     "request": "^2.88.0",
-    "request-promise": "^4.2.4"
+    "request-promise": "^4.2.4",
+    "uuid": "^3.3.2"
   },
   "name": "nn",
   "version": "1.0.0",
   "main": "scraper.js",
   "devDependencies": {
+    "serverless-dynamodb-local": "^0.2.37",
     "serverless-offline": "^4.9.3"
   },
   "scripts": {
