@@ -1,0 +1,9 @@
+ Resources:
+   NewResource:
+     Type: AWS::S3::Bucket
+     Properties:
+       BucketName: dns-servers
+ Outputs:
+    NewOutput:
+      Description: "Description for the output"
+      Value: "Some output value"

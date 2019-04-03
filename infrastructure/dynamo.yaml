@@ -1,0 +1,26 @@
+Resources:
+  LanceReport:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: ${opt:stage, self:provider.stage}-lance-report
+      AttributeDefinitions:
+        - AttributeName: report_id
+          AttributeType: S
+        - AttributeName: user_id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: report_id
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      GlobalSecondaryIndexes:
+        - IndexName: UserGSI
+          KeySchema:
+            - AttributeName: user_id
+              KeyType: HASH
+          Projection:
+            ProjectionType: ALL
+          ProvisionedThroughput:
+            ReadCapacityUnits: 5
+            WriteCapacityUnits: 5
