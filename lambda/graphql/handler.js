@@ -1,18 +1,12 @@
-import { graphqlLambda, graphiqlLambda } from 'apollo-server-lambda';
-import { makeExecutableSchema } from 'graphql-tools';
-import { schema } from './schema';
-import { resolvers } from './resolvers';
+const { ApolloServer, gql } = require('apollo-server-lambda');
 
-const myGraphQLSchema = makeExecutableSchema({
-  typeDefs: schema,
-  resolvers,
+const typeDefs = require('./schema')
+const resolvers = require('./resolvers')
+const server = new ApolloServer({ typeDefs, resolvers });
+
+exports.handler = server.createHandler({
+  cors: {
+    origin: '*',
+    credentials: true,
+  },
 });
-
-module.exports.handler = async (event) => {
-  const callbackWithHeaders = (error, output) => {
-    output.headers['Access-Control-Allow-Origin'] = '*';
-    callback(error, output);
-  }
-  const handler = graphqlLambda({ schema: myGraphQLSchema });
-  return handler(event, context, callbackWithHeaders);
-};

@@ -10,11 +10,16 @@ const tableName = process.env.DNS_SERVERS_TABLE
 var AWS = require('aws-sdk');
 AWS.config.update({ region: 'eu-west-1' });
 
-var ddb
-ddb = new AWS.DynamoDB.DocumentClient({
-  region: 'localhost',
-  endpoint: 'http://localhost:8000'
-})
+const IS_OFFLINE = process.env.IS_OFFLINE;
+let ddb;
+if (IS_OFFLINE === 'true') {
+  ddb = new AWS.DynamoDB.DocumentClient({
+    region: 'localhost',
+    endpoint: 'http://localhost:8000'
+  })
+} else {
+  ddb = new AWS.DynamoDB.DocumentClient();
+};
 
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -25,13 +30,14 @@ module.exports.handler = async (event) => {
   const countriesNodes = $('div.col-12.col-lg-8 > ul > li > a', html)
   const countries = [];
   for (let i = 0; i < countriesNodes.length; i++) {
+    const url = `${baseUrl}${countriesNodes[i].attribs.href}`
+    const code = countriesNodes[i].attribs.href.split("/")[2].split(".")[0]
     countries.push({
-      url: `${baseUrl}${countriesNodes[i].attribs.href}`,
+      url,
+      code,
       name: countriesNodes[i].children[0].data.toLocaleLowerCase()
     });
   }
-
-  console.log(countries.length)
 
   const promises = countries.map(async country => {
     await sleep(Math.random() * 1000 + 500)
@@ -49,7 +55,12 @@ module.exports.handler = async (event) => {
 
   const countryData = await Promise.all(promises)
   const servers = countryData.reduce((obj, country) => {
-    obj[country.name] = country
+    obj[country.code] = country
+    return obj
+  }, {})
+
+  const countriesMap = countryData.reduce((obj, country) => {
+    obj[country.code] = country.name
     return obj
   }, {})
 
@@ -57,7 +68,7 @@ module.exports.handler = async (event) => {
   const item = {
     id: itemId,
     servers,
-    countries: Object.keys(servers)
+    countries: countriesMap
   }
   var params = {
     TableName: tableName,
